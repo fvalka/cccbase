@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 @Slf4j
-public class Level1 implements Level {
+public class Level1 extends Level {
     @Override
     public String apply(List<String> strings) {
         return strings.get(0);
