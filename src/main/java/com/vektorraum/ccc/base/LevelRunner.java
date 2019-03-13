@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +36,8 @@ public class LevelRunner {
 
     }
 
-    private static File[] getResourceFolderFiles (String folder) throws URISyntaxException {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(folder);
-        File[] files = new File(url.toURI()).listFiles();
+    public static File[] getResourceFolderFiles (String folder) throws URISyntaxException {
+        File[] files = new File(folder).listFiles();
         return files;
     }
 }

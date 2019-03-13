@@ -14,6 +14,6 @@ public class Level1 implements Level {
     }
 
     public static void main(String[] args) throws Exception {
-        LevelRunner.runOnResourceFolder(new Level1(), "data/level1");
+        LevelRunner.runOnResourceFolder(new Level1(), "data/level1/in");
     }
 }
