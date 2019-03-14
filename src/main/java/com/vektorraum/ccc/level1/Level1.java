@@ -15,6 +15,10 @@ public class Level1 extends Level {
         double distance = Double.parseDouble(inputs[1]);
         double steeringAngle = Double.parseDouble(inputs[2]);
 
+        if (steeringAngle == 0.0) {
+            return String.format("%.2f %.2f %.2f", 0.0, distance, 0.0).replace(",",".");
+        }
+
         double radius = wheelBase / Math.sin(Math.toRadians(steeringAngle));
         log.info("Radius: {}", radius);
 
@@ -31,7 +35,7 @@ public class Level1 extends Level {
             dy = -1.0 * dy;
         }*/
 
-        if (finalAngle < 0) {
+        while (finalAngle < 0) {
             finalAngle = 360.00 + finalAngle;
         }
 
