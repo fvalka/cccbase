@@ -1,6 +1,7 @@
 package com.vektorraum.ccc.level5;
 
 import com.vektorraum.ccc.base.Level;
+import com.vektorraum.ccc.level1.Position;
 import com.vektorraum.ccc.level1.Rover;
 import com.vektorraum.ccc.level1.SteeringCommand;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import java.util.List;
 public class Level5 extends Level {
     @Override
     public String apply(List<String> strings) {
+        log.info("Running level5");
 
         RestTemplate restTemplate = new RestTemplate();
         String map = "L5_MAF3401R";
@@ -41,6 +43,7 @@ public class Level5 extends Level {
 
         double steerAngle = 5.0;
         double targetPos1Norm = targetX + targetY;
+        double targetPos2Norm = Math.sqrt(Math.pow(targetX, 2.0) + Math.pow(targetY, 2.0));
         double originalAngleToTarget = Math.atan(targetY / targetX);
         double distanceToTarget = Math.sqrt(Math.pow(targetX, 2.0) + Math.pow(targetY, 2.0));
         double distance = distanceToTarget;
@@ -50,29 +53,58 @@ public class Level5 extends Level {
 
         Rover rover = new Rover(wheelBase);
 
-        for (int i = 0; i < 10000; i++) {
-            boolean distanceHit = false;
-            boolean posHit = false;
+        double bestDistanceToTarget = Double.MAX_VALUE;
+        SteeringCommand bestSteer = null;
+        Position bestPos = null;
+        for (double steer = 0.0; steer < maxSteeringAngle; steer += maxSteeringAngle / 80.0) {
+            for (double dist = 0.0; dist < 100.0; dist += targetPos2Norm / 20.0) {
+                rover.reset();
+                SteeringCommand currentSteer = new SteeringCommand(dist, steer);
+                rover.steer(currentSteer);
 
-            rover.reset();
-            rover.steer(new SteeringCommand(distance, steerAngle));
+                double currentDistanceToTarget = Math.sqrt(Math.pow(targetX - rover.getPosition().getX(), 2.0) + Math.pow(targetY - rover.getPosition().getY(), 2.0));
 
-            double currentPos1Norm = rover.getPosition().getX() + rover.getPosition().getY();
-            if (currentPos1Norm > targetPos1Norm + targetRadius / 2.0) {
-                distance = distance - (currentPos1Norm - targetPos1Norm) * distanceLearningRate;
-            } else if (currentPos1Norm < targetPos1Norm - targetRadius / 2.0) {
-                distance = distance + (currentPos1Norm - targetPos1Norm) * distanceLearningRate;
-            } else {
-                break;
+                if (currentDistanceToTarget < bestDistanceToTarget) {
+                    bestSteer = currentSteer;
+                    bestDistanceToTarget = currentDistanceToTarget;
+                    bestPos = rover.getPosition();
+                }
+
             }
-
-            double currentAngleToTarget = Math.atan((targetY - rover.getPosition().getY()) / (targetX - rover.getPosition().getX()));
-            steerAngle = steerAngle - (originalAngleToTarget - Math.toDegrees(currentAngleToTarget)) * angleLearningRate/currentPos1Norm;
         }
+        log.info("Best position: {}", bestPos);
+        log.info("Distance to target: {}", Math.sqrt(Math.pow(targetX - bestPos.getX(), 2.0) + Math.pow(targetY - bestPos.getY(), 2.0)));
 
         log.info("Rover pos after learning: {}", rover.getPosition());
+        log.info("Best steer: {}", bestSteer);
 
-        //moveRover(restTemplate, base, roverUuid, distance, steerAngle);
+        moveRover(restTemplate, base, roverUuid, bestSteer.getDistance(), bestSteer.getSteeringAngle());
+
+        /*Position bestPos2 = null;
+        for (double steer = 0.0; steer < maxSteeringAngle; steer += maxSteeringAngle / 80.0) {
+            for (double dist = 0.0; dist < 100.0; dist += targetPos2Norm / 20.0) {
+                rover.setPosition(bestPos);
+                SteeringCommand currentSteer = new SteeringCommand(dist, steer);
+                rover.steer(currentSteer);
+
+                double currentDistanceToTarget = Math.sqrt(Math.pow(targetX - rover.getPosition().getX(), 2.0) + Math.pow(targetY - rover.getPosition().getY(), 2.0));
+
+                if (currentDistanceToTarget < bestDistanceToTarget) {
+                    bestSteer = currentSteer;
+                    bestDistanceToTarget = currentDistanceToTarget;
+                    bestPos2 = rover.getPosition();
+                }
+
+            }
+        }
+        log.info("Best position: {}", bestPos);
+        log.info("Distance to target: {}", Math.sqrt(Math.pow(targetX - bestPos.getX(), 2.0) + Math.pow(targetY - bestPos.getY(), 2.0)));
+
+        log.info("Rover pos after learning: {}", rover.getPosition());
+        log.info("Best steer: {}", bestSteer);
+
+        moveRover(restTemplate, base, roverUuid, bestSteer.getDistance(), bestSteer.getSteeringAngle());*/
+
         return "";
     }
 
