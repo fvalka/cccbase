@@ -36,6 +36,11 @@ public class LevelRunner {
 
     }
 
+    public static void runOnMultiLineResourceFolder(Level level, String folderPath) throws IOException, URISyntaxException {
+        MultiLineLevelRun multiLevel = new MultiLineLevelRun(level);
+        runOnResourceFolder(multiLevel, folderPath);
+    }
+
     public static File[] getResourceFolderFiles (String folder) throws URISyntaxException {
         File[] files = new File(folder).listFiles();
         return files;

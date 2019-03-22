@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 @Slf4j
+@SuppressWarnings("Duplicates")
 public class Level1 extends Level {
     @Override
     public String apply(List<String> strings) {
@@ -14,6 +15,6 @@ public class Level1 extends Level {
     }
 
     public static void main(String[] args) throws Exception {
-        LevelRunner.runOnResourceFolder(new Level1(), "data/level1/in");
+        LevelRunner.runOnMultiLineResourceFolder(new Level1(), "data/level1/in");
     }
 }
